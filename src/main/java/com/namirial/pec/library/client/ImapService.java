@@ -67,11 +67,7 @@ public class ImapService {
             Folder folderInbox = store.getFolder(CONSTANT_FOLDER);
             folderInbox.open(Folder.READ_WRITE);
             
-            SearchTerm searchTerm = new MessageIDTerm(messageID);
-            Message[] messages = folderInbox.search(searchTerm);
-            
-            if (messages.length > 1)
-            	throw new PnSpapiPermanentErrorException ("The number of messages returned is > 1");
+            Message[] messages = getMessagesByMessageID(folderInbox, messageID);
             
             for (Message message : messages) {
             	message.setFlag(Flags.Flag.SEEN, true);
@@ -115,11 +111,7 @@ public class ImapService {
             Folder folderInbox = store.getFolder(CONSTANT_FOLDER);
             folderInbox.open(Folder.READ_WRITE);
             
-            SearchTerm searchTerm = new MessageIDTerm(messageID);
-            Message[] messages = folderInbox.search(searchTerm);
-            
-            if (messages.length > 1)
-            	throw new PnSpapiPermanentErrorException ("The number of messages returned is > 1");
+            Message[] messages = getMessagesByMessageID(folderInbox, messageID);
             
             for (Message message : messages) {
             	message.setFlag(Flags.Flag.DELETED, true);
@@ -133,5 +125,21 @@ public class ImapService {
         } finally {
         	imapConnectionPool.releaseImapConnection(store);
         }
+	}
+	
+	private static Message[] getMessagesByMessageID(Folder folderInbox, String messageID)
+			throws PnSpapiTemporaryErrorException, PnSpapiPermanentErrorException {
+		
+		try {
+			SearchTerm searchTerm = new MessageIDTerm(messageID);
+	        Message[] messages = folderInbox.search(searchTerm);
+	        
+	        if (messages.length > 1)
+	        	throw new PnSpapiPermanentErrorException ("The number of messages returned is > 1");
+	        
+	        return messages;
+		} catch (MessagingException e) {
+			throw new PnSpapiTemporaryErrorException (e.getMessage());
+		}
 	}
 }
