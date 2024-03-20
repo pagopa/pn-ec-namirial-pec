@@ -1,5 +1,7 @@
 package com.namirial.pec.library.client;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +22,8 @@ import jakarta.mail.search.SearchTerm;
 
 public class ImapService {
 	
+	private static final String CONSTANT_FOLDER = "INBOX";
+	
 	public static PnGetMessagesResponse getUnreadMessages (int limit) {
 		
 		ImapConnectionPool imapConnectionPool = ImapConnectionPool.getInstance();
@@ -27,7 +31,7 @@ public class ImapService {
         Store store = imapConnectionPool.getImapConnection();
         
         try {
-            Folder folderInbox = store.getFolder("INBOX");
+            Folder folderInbox = store.getFolder(CONSTANT_FOLDER);
             folderInbox.open(Folder.READ_ONLY);
             
             Message[] messages = folderInbox.search(
@@ -35,14 +39,18 @@ public class ImapService {
             
             List<byte[]> messagesList = new ArrayList<>();
             
+            ByteArrayOutputStream outputStream  = new ByteArrayOutputStream();
+            
             for (int i = 0; i < limit && i < messages.length; i++) {
-            	//TODO
+            	messages[i].writeTo(outputStream);
+            	messagesList.add(outputStream.toByteArray());
+            	outputStream.reset();
             }
             
             folderInbox.close(false);
             
             return new PnGetMessagesResponse(new PnListOfMessages(messagesList), messages.length);
-        } catch (MessagingException e) {
+        } catch (MessagingException | IOException e) {
             throw new PnSpapiTemporaryErrorException (e.getMessage());
         } finally {
         	imapConnectionPool.releaseImapConnection(store);
@@ -56,7 +64,7 @@ public class ImapService {
         Store store = imapConnectionPool.getImapConnection();
         
         try {
-            Folder folderInbox = store.getFolder("INBOX");
+            Folder folderInbox = store.getFolder(CONSTANT_FOLDER);
             folderInbox.open(Folder.READ_WRITE);
             
             SearchTerm searchTerm = new MessageIDTerm(messageID);
@@ -86,7 +94,7 @@ public class ImapService {
         Store store = imapConnectionPool.getImapConnection();
         
         try {
-            Folder folderInbox = store.getFolder("INBOX");
+            Folder folderInbox = store.getFolder(CONSTANT_FOLDER);
             folderInbox.open(Folder.READ_ONLY);
             
             return folderInbox.getMessageCount();
@@ -104,7 +112,7 @@ public class ImapService {
         Store store = imapConnectionPool.getImapConnection();
         
         try {
-            Folder folderInbox = store.getFolder("INBOX");
+            Folder folderInbox = store.getFolder(CONSTANT_FOLDER);
             folderInbox.open(Folder.READ_WRITE);
             
             SearchTerm searchTerm = new MessageIDTerm(messageID);
