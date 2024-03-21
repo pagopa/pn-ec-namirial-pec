@@ -6,6 +6,7 @@ import com.namirial.pec.library.client.SmtpService;
 import it.pagopa.pn.library.pec.pojo.PnGetMessagesResponse;
 import it.pagopa.pn.library.pec.service.PnPecService;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 public class PnPecServiceImpl implements PnPecService {
 
@@ -14,7 +15,7 @@ public class PnPecServiceImpl implements PnPecService {
 		
         return Mono.fromCallable(() -> {
             return SmtpService.sendMail(message);
-        });
+        }).subscribeOn(Schedulers.boundedElastic());
 	}
 
 	@Override
@@ -22,7 +23,7 @@ public class PnPecServiceImpl implements PnPecService {
 		
 		return Mono.fromCallable(() -> {
 			return ImapService.getUnreadMessages(limit);
-        });
+        }).subscribeOn(Schedulers.boundedElastic());
 	}
 
 	@Override
@@ -30,7 +31,7 @@ public class PnPecServiceImpl implements PnPecService {
 		
 		return Mono.fromCallable(() -> {
 			return ImapService.markMessageAsRead(messageID);
-        });
+        }).subscribeOn(Schedulers.boundedElastic());
 	}
 
 	@Override
@@ -38,7 +39,7 @@ public class PnPecServiceImpl implements PnPecService {
 		
 		return Mono.fromCallable(() -> {
 			return ImapService.getMessageCount();
-        });
+        }).subscribeOn(Schedulers.boundedElastic());
 	}
 
 	@Override
@@ -46,6 +47,6 @@ public class PnPecServiceImpl implements PnPecService {
 		
 		return Mono.fromCallable(() -> {
 			return ImapService.deleteMessage(messageID);
-        });
+        }).subscribeOn(Schedulers.boundedElastic());
 	}
 }
