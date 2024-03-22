@@ -1,0 +1,35 @@
+From: test@test.it
+To: test2@test.it
+Subject: Test
+Content-Type: multipart/alternative;
+	boundary="_000_AM6PR01MB5366B6DD81B165B1B875CF1BEC4C2AM6PR01MB5366eurp_"
+Message-ID: <cG4tZGVsaXZlcnktMDAy~U0VORF9ESUdJVEFMLklVTl9MTlROLVFVV1ktUkxXSi0yMDIzMTItWi0xLlJFQ0lOREVYXzAuU09VUkNFX1NQRUNJQUwuUkVQRUFUX2ZhbHNlLkFUVEVNUFRfMA==@pagopa.it>
+MIME-Version: 1.0
+
+--_000_AM6PR01MB5366B6DD81B165B1B875CF1BEC4C2AM6PR01MB5366eurp_
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+Prova
+
+--_000_AM6PR01MB5366B6DD81B165B1B875CF1BEC4C2AM6PR01MB5366eurp_
+Content-Type: text/html; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+<html>
+<head>
+<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Diso-8859-=
+1">
+<style type=3D"text/css" style=3D"display:none;"> P {margin-top:0;margin-bo=
+ttom:0;} </style>
+</head>
+<body dir=3D"ltr">
+<div class=3D"elementToProof" style=3D"font-family: Aptos, Aptos_EmbeddedFo=
+nt, Aptos_MSFontService, Calibri, Helvetica, sans-serif; font-size: 12pt; c=
+olor: rgb(0, 0, 0);">
+Prova</div>
+<div id=3D"Signature"></div>
+</body>
+</html>
+
+--_000_AM6PR01MB5366B6DD81B165B1B875CF1BEC4C2AM6PR01MB5366eurp_--
