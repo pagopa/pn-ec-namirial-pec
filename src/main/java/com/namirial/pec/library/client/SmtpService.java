@@ -10,6 +10,7 @@ import it.pagopa.pn.library.exceptions.PnSpapiPermanentErrorException;
 import it.pagopa.pn.library.exceptions.PnSpapiTemporaryErrorException;
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
+import jakarta.mail.SendFailedException;
 import jakarta.mail.Session;
 import jakarta.mail.Transport;
 import jakarta.mail.internet.MimeMessage;
@@ -35,7 +36,7 @@ public class SmtpService {
 	        String messageIdInput = mimeMessage.getHeader("Message-ID")[0];
 	        
 	        return messageIdInput.substring(1, messageIdInput.length()-1);
-        } catch (ParseException e) {
+        } catch (ParseException | SendFailedException e) {
         	throw new PnSpapiPermanentErrorException(e.getMessage());
         } catch (MessagingException e) {
             throw new PnSpapiTemporaryErrorException(e.getMessage());

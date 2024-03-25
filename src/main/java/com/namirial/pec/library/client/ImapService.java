@@ -127,7 +127,7 @@ public class ImapService {
         }
 	}
 	
-	private static Message[] getMessagesByMessageID(Folder folderInbox, String messageID)
+	public static Message[] getMessagesByMessageID(Folder folderInbox, String messageID)
 			throws PnSpapiTemporaryErrorException, PnSpapiPermanentErrorException {
 		
 		try {
