@@ -55,8 +55,7 @@ class SmtpServiceTest {
 		Session session = Session.getDefaultInstance(new Properties());
 		MimeMessage mimeMessage = new MimeMessage(session, inputStream);
         
-        String messageIdInput = mimeMessage.getHeader("Message-ID")[0];
-        messageId = messageIdInput.substring(1, messageIdInput.length()-1);
+        messageId = mimeMessage.getHeader("Message-ID")[0];
 		
 		String returnedMessageId = SmtpService.sendMail(message);
 		assertEquals(messageId, returnedMessageId);
