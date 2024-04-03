@@ -33,9 +33,7 @@ public class SmtpService {
             
 	        transport.sendMessage(mimeMessage, mimeMessage.getRecipients(Message.RecipientType.TO));
 	        
-	        String messageIdInput = mimeMessage.getHeader("Message-ID")[0];
-	        
-	        return messageIdInput.substring(1, messageIdInput.length()-1);
+	        return mimeMessage.getHeader("Message-ID")[0];
         } catch (ParseException | SendFailedException e) {
         	throw new PnSpapiPermanentErrorException(e.getMessage());
         } catch (MessagingException e) {
