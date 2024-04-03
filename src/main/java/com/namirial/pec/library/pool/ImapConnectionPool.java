@@ -47,7 +47,7 @@ public class ImapConnectionPool {
 			
 			return pool.borrowObject();
 		} catch (Exception e) {
-            throw new PnSpapiTemporaryErrorException (e.getMessage());
+            throw new PnSpapiTemporaryErrorException ("getImapConnection: " + e.getClass() + " " + e.getMessage());
 		}
 	}
 	

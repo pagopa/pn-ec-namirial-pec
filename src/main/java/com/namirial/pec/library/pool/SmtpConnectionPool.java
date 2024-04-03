@@ -47,7 +47,7 @@ public class SmtpConnectionPool {
 			
 			return pool.borrowObject();
 		} catch (Exception e) {
-            throw new PnSpapiTemporaryErrorException (e.getMessage());
+            throw new PnSpapiTemporaryErrorException ("getSmtpConnection: " + e.getClass() + " " + e.getMessage());
 		}
 	}
 	

@@ -35,7 +35,7 @@ public class ImapConnectionFactory extends BasePooledObjectFactory<Store> {
 			store = session.getStore("imaps");
 			store.connect(host, Integer.valueOf(port), username, password);
 		} catch (MessagingException e) {
-            throw new PnSpapiTemporaryErrorException(e.getMessage());
+            throw new PnSpapiTemporaryErrorException("create: " + e.getClass() + " " + e.getMessage());
 		}
         
         return store;

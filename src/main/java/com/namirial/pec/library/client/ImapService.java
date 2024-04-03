@@ -52,7 +52,7 @@ public class ImapService {
             
             return new PnGetMessagesResponse(new PnListOfMessages(messagesList), messages.length);
         } catch (MessagingException | IOException e) {
-            throw new PnSpapiTemporaryErrorException (e.getMessage());
+            throw new PnSpapiTemporaryErrorException ("getUnreadMessages: " + e.getClass() + " " + e.getMessage());
         } finally {
         	imapConnectionPool.releaseImapConnection(store);
         }
@@ -78,7 +78,7 @@ public class ImapService {
             
             return null;
         } catch (MessagingException e) {
-        	throw new PnSpapiTemporaryErrorException (e.getMessage());
+        	throw new PnSpapiTemporaryErrorException ("markMessageAsRead: " + e.getClass() + " " + e.getMessage());
         } finally {
         	imapConnectionPool.releaseImapConnection(store);
         }
@@ -96,7 +96,7 @@ public class ImapService {
             
             return folderInbox.getMessageCount();
         } catch (MessagingException e) {
-        	throw new PnSpapiTemporaryErrorException (e.getMessage());
+        	throw new PnSpapiTemporaryErrorException ("getMessageCount: " + e.getClass() + " " + e.getMessage());
         } finally {
         	imapConnectionPool.releaseImapConnection(store);
         }
@@ -122,7 +122,7 @@ public class ImapService {
             
             return null;
         } catch (MessagingException e) {
-        	throw new PnSpapiTemporaryErrorException (e.getMessage());
+        	throw new PnSpapiTemporaryErrorException ("deleteMessage: " + e.getClass() + " " + e.getMessage());
         } finally {
         	imapConnectionPool.releaseImapConnection(store);
         }
@@ -140,7 +140,7 @@ public class ImapService {
 	        
 	        return messages;
 		} catch (MessagingException e) {
-			throw new PnSpapiTemporaryErrorException (e.getMessage());
+			throw new PnSpapiTemporaryErrorException ("getMessagesByMessageID: " + e.getClass() + " " + e.getMessage());
 		}
 	}
 }
