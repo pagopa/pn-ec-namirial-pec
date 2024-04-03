@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.namirial.pec.library.conf.Configuration;
 import com.namirial.pec.library.pool.ImapConnectionPool;
 
 import it.pagopa.pn.library.exceptions.PnSpapiPermanentErrorException;
@@ -22,7 +23,7 @@ import jakarta.mail.search.SearchTerm;
 
 public class ImapService {
 	
-	private static final String CONSTANT_FOLDER = "INBOX";
+	private static final String CONSTANT_FOLDER = Configuration.getImapFolder();
 	
 	public static PnGetMessagesResponse getUnreadMessages (int limit) {
 		

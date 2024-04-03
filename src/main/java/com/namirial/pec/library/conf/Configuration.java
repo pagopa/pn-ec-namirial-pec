@@ -2,6 +2,9 @@ package com.namirial.pec.library.conf;
 
 public class Configuration {
 	
+    //IMAP
+    private static final String DEFAULT_IMAP_FOLDER = "Search.All";
+    
     //DEFAULT POOL IMAP
     private static final String DEFAULT_POOL_IMAP_MAXTOTAL = "10";
     
@@ -23,6 +26,10 @@ public class Configuration {
 
     public static String getImapPort() {
         return System.getProperty("namirial.server.imap.port");
+    }
+    
+    public static String getImapFolder() {
+        return System.getProperty("namirial.server.imap.folder", DEFAULT_IMAP_FOLDER);
     }
     
     //SMTP
