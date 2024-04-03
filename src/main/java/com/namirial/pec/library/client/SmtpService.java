@@ -35,9 +35,9 @@ public class SmtpService {
 	        
 	        return mimeMessage.getHeader("Message-ID")[0];
         } catch (ParseException | SendFailedException e) {
-        	throw new PnSpapiPermanentErrorException(e.getMessage());
+        	throw new PnSpapiPermanentErrorException("sendMail: " + e.getClass() + " " + e.getMessage());
         } catch (MessagingException e) {
-            throw new PnSpapiTemporaryErrorException(e.getMessage());
+            throw new PnSpapiTemporaryErrorException("sendMail: " + e.getClass() + " " + e.getMessage());
         } finally {
         	smtpConnectionPool.releaseSmtpConnection(transport);
         }

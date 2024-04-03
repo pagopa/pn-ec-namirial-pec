@@ -37,7 +37,7 @@ public class SmtpConnectionFactory extends BasePooledObjectFactory<Transport> {
 			transport = session.getTransport("smtps");
 			transport.connect(host, Integer.valueOf(port), username, password);
 		} catch (MessagingException e) {
-	        throw new PnSpapiTemporaryErrorException(e.getMessage());
+	        throw new PnSpapiTemporaryErrorException("create: " + e.getClass() + " " + e.getMessage());
 		}
         
         return transport;
