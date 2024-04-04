@@ -34,8 +34,13 @@ public class SmtpService {
 	        transport.sendMessage(mimeMessage, mimeMessage.getRecipients(Message.RecipientType.TO));
 	        
 	        return mimeMessage.getHeader("Message-ID")[0];
-        } catch (ParseException | SendFailedException e) {
+        } catch (ParseException e) {
         	throw new PnSpapiPermanentErrorException("sendMail: " + e.getClass() + " " + e.getMessage());
+        } catch (SendFailedException e) {
+        	if (e.getMessage().equals("Invalid Addresses"))
+        		throw new PnSpapiPermanentErrorException("sendMail: " + e.getClass() + " " + e.getMessage());
+        	else
+        		throw new PnSpapiTemporaryErrorException("sendMail: " + e.getClass() + " " + e.getMessage());
         } catch (MessagingException e) {
             throw new PnSpapiTemporaryErrorException("sendMail: " + e.getClass() + " " + e.getMessage());
         } finally {
