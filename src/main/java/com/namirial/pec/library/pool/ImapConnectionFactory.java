@@ -45,4 +45,19 @@ public class ImapConnectionFactory extends BasePooledObjectFactory<Store> {
     public PooledObject<Store> wrap(Store store) {
         return new DefaultPooledObject<>(store);
     }
+    
+    @Override
+    public void destroyObject(PooledObject<Store> p) throws Exception {
+        p.getObject().close();
+    }
+
+    @Override
+    public boolean validateObject(PooledObject<Store> p) {
+        Store store = p.getObject();
+        try {
+            return store.isConnected() && store.getDefaultFolder() != null;
+        } catch (MessagingException e) {
+            return false;
+        }
+    }
 }

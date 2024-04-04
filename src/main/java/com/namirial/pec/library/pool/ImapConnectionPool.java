@@ -35,6 +35,8 @@ public class ImapConnectionPool {
 		        config.setMinIdle(Integer.valueOf(Configuration.getPoolImapMinIdle()));
 		        
 		        pool = new GenericObjectPool<Store>(new ImapConnectionFactory(), config);
+		        pool.setTestOnBorrow(true);
+		        pool.setTestOnCreate(true);
 			}
 		}
 	}
