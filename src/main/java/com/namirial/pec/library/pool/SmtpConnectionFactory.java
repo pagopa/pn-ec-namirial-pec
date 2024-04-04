@@ -8,6 +8,8 @@ import org.apache.commons.pool2.impl.DefaultPooledObject;
 
 import com.namirial.pec.library.conf.Configuration;
 
+import com.sun.mail.smtp.SMTPTransport;
+
 import it.pagopa.pn.library.exceptions.PnSpapiTemporaryErrorException;
 import jakarta.mail.MessagingException;
 import jakarta.mail.Session;
@@ -46,5 +48,22 @@ public class SmtpConnectionFactory extends BasePooledObjectFactory<Transport> {
     @Override
     public PooledObject<Transport> wrap(Transport transport) {
         return new DefaultPooledObject<>(transport);
+    }
+    
+    @Override
+    public void destroyObject(PooledObject<Transport> p) throws Exception {
+        p.getObject().close();
+    }
+
+    @Override
+    public boolean validateObject(PooledObject<Transport> p) {
+        Transport transport = p.getObject();
+        try {
+        	SMTPTransport smtpTransport = (SMTPTransport) transport;
+        	smtpTransport.issueCommand("NOOP",250);
+        	return true;
+		} catch (MessagingException e) {
+			return false;
+		}
     }
 }

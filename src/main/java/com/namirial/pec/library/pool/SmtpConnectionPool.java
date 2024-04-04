@@ -35,6 +35,8 @@ public class SmtpConnectionPool {
 		        config.setMinIdle(Integer.valueOf(Configuration.getPoolSmtpMinIdle()));
 		        
 		        pool = new GenericObjectPool<Transport>(new SmtpConnectionFactory(), config);
+		        pool.setTestOnBorrow(true);
+		        pool.setTestOnCreate(true);
 			}
 		}
 	}
