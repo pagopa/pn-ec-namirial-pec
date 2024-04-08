@@ -8,6 +8,8 @@ import java.util.List;
 import com.namirial.pec.library.conf.Configuration;
 import com.namirial.pec.library.pool.ImapConnectionPool;
 
+import com.sun.mail.util.MessageRemovedIOException;
+
 import it.pagopa.pn.library.exceptions.PnSpapiPermanentErrorException;
 import it.pagopa.pn.library.exceptions.PnSpapiTemporaryErrorException;
 import it.pagopa.pn.library.pec.pojo.PnGetMessagesResponse;
@@ -15,6 +17,7 @@ import it.pagopa.pn.library.pec.pojo.PnListOfMessages;
 import jakarta.mail.Flags;
 import jakarta.mail.Folder;
 import jakarta.mail.Message;
+import jakarta.mail.MessageRemovedException;
 import jakarta.mail.MessagingException;
 import jakarta.mail.Store;
 import jakarta.mail.search.FlagTerm;
@@ -42,10 +45,15 @@ public class ImapService {
             
             ByteArrayOutputStream outputStream  = new ByteArrayOutputStream();
             
-            for (int i = 0; i < limit && i < messages.length; i++) {
-            	messages[i].writeTo(outputStream);
-            	messagesList.add(outputStream.toByteArray());
-            	outputStream.reset();
+            for (int i = 0; messagesList.size() < limit && i < messages.length; i++) {
+            	try {
+	            	messages[i].writeTo(outputStream);
+	            	messagesList.add(outputStream.toByteArray());
+	            	outputStream.reset();
+            	} catch (MessageRemovedIOException | MessageRemovedException e) {
+            		//Queste eccezioni vengono generate sempre quando il messaggio è cancellato. Il messaggio verrà saltato.
+            		continue;
+            	}
             }
             
             folderInbox.close(false);
