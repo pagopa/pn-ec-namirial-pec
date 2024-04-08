@@ -1,5 +1,7 @@
 package com.namirial.pec.library.pool;
 
+import java.time.Duration;
+
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 
@@ -33,6 +35,9 @@ public class SmtpConnectionPool {
 				config.setMaxTotal(Integer.valueOf(Configuration.getPoolSmtpMaxTotal()));
 		        config.setMaxIdle(Integer.valueOf(Configuration.getPoolSmtpMaxIdle()));
 		        config.setMinIdle(Integer.valueOf(Configuration.getPoolSmtpMinIdle()));
+		        
+		        config.setTimeBetweenEvictionRuns(Duration.ofMillis(60000));
+		        config.setSoftMinEvictableIdleDuration(Duration.ofMillis(60000));
 		        
 		        pool = new GenericObjectPool<Transport>(new SmtpConnectionFactory(), config);
 		        pool.setTestOnBorrow(true);
