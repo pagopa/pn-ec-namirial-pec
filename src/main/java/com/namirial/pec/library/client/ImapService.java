@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.codec.digest.DigestUtils;
+
 import com.namirial.pec.library.conf.Configuration;
 import com.namirial.pec.library.pool.ImapConnectionPool;
 
@@ -27,6 +29,7 @@ import jakarta.mail.search.SearchTerm;
 public class ImapService {
 	
 	private static final String CONSTANT_FOLDER = Configuration.getImapFolder();
+    private static final String CONSTANT_HASH_FOLDER = "INBOX.";
 	
 	public static PnGetMessagesResponse getUnreadMessages (int limit) {
 		
@@ -73,7 +76,7 @@ public class ImapService {
         Store store = imapConnectionPool.getImapConnection();
         
         try {
-            Folder folderInbox = store.getFolder(CONSTANT_FOLDER);
+            Folder folderInbox = store.getFolder(CONSTANT_HASH_FOLDER + getHashFolder(messageID));
             folderInbox.open(Folder.READ_WRITE);
             
             Message[] messages = getMessagesByMessageID(folderInbox, messageID);
@@ -117,7 +120,7 @@ public class ImapService {
         Store store = imapConnectionPool.getImapConnection();
         
         try {
-            Folder folderInbox = store.getFolder(CONSTANT_FOLDER);
+            Folder folderInbox = store.getFolder(CONSTANT_HASH_FOLDER + getHashFolder(messageID));
             folderInbox.open(Folder.READ_WRITE);
             
             Message[] messages = getMessagesByMessageID(folderInbox, messageID);
@@ -151,4 +154,9 @@ public class ImapService {
 			throw new PnSpapiTemporaryErrorException ("getMessagesByMessageID: " + e.getClass() + " " + e.getMessage());
 		}
 	}
+    
+    public static String getHashFolder (String messageID) {
+        String sha1MessageID = DigestUtils.sha1Hex(messageID);
+        return sha1MessageID.substring(0, 1);
+    }
 }
