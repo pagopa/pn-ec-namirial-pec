@@ -122,7 +122,7 @@ class ImapServiceTest {
         ImapService.deleteMessage(messageID);
         
         Mockito.verify(messagesMock[0]).setFlag(Flags.Flag.DELETED, true);
-        Mockito.verify(folderMock).close(true);
+        Mockito.verify(folderMock).close(false);
     }
     
     @Test
@@ -173,9 +173,9 @@ class ImapServiceTest {
         
         Mockito.when(folderMock.search(Mockito.any(SearchTerm.class))).thenReturn(messagesMock);
         
-        Mockito.when(ImapService.getMessagesByMessageID(folderMock, messageID)).thenReturn(messagesMock);
+        Mockito.when(ImapService.getMessagesByMessageID(folderMock, messageID, false)).thenReturn(messagesMock);
         
-        Message[] returnedMessages = ImapService.getMessagesByMessageID(folderMock, messageID);
+        Message[] returnedMessages = ImapService.getMessagesByMessageID(folderMock, messageID, false);
         
         assertEquals(messagesMock.length, returnedMessages.length);
     }
@@ -190,7 +190,7 @@ class ImapServiceTest {
         Mockito.when(folderMock.search(Mockito.any(SearchTerm.class))).thenReturn(messagesMock);
         
         assertThrows(PnSpapiPermanentErrorException.class, () -> {
-            ImapService.getMessagesByMessageID(folderMock, messageID);
+            ImapService.getMessagesByMessageID(folderMock, messageID, true);
         });
     }
 }

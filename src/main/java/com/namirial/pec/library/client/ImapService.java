@@ -22,6 +22,7 @@ import jakarta.mail.Message;
 import jakarta.mail.MessageRemovedException;
 import jakarta.mail.MessagingException;
 import jakarta.mail.Store;
+import jakarta.mail.search.AndTerm;
 import jakarta.mail.search.FlagTerm;
 import jakarta.mail.search.MessageIDTerm;
 import jakarta.mail.search.SearchTerm;
@@ -75,11 +76,13 @@ public class ImapService {
         
         Store store = imapConnectionPool.getImapConnection();
         
+        messageID = trimMessageID(messageID);
+        
         try {
             Folder folderInbox = store.getFolder(CONSTANT_HASH_FOLDER + getHashFolder(messageID));
             folderInbox.open(Folder.READ_WRITE);
             
-            Message[] messages = getMessagesByMessageID(folderInbox, messageID);
+            Message[] messages = getMessagesByMessageID(folderInbox, messageID, false);
             
             for (Message message : messages) {
             	message.setFlag(Flags.Flag.SEEN, true);
@@ -119,17 +122,19 @@ public class ImapService {
         
         Store store = imapConnectionPool.getImapConnection();
         
+        messageID = trimMessageID(messageID);
+        
         try {
             Folder folderInbox = store.getFolder(CONSTANT_HASH_FOLDER + getHashFolder(messageID));
             folderInbox.open(Folder.READ_WRITE);
             
-            Message[] messages = getMessagesByMessageID(folderInbox, messageID);
+            Message[] messages = getMessagesByMessageID(folderInbox, messageID, true);
             
             for (Message message : messages) {
             	message.setFlag(Flags.Flag.DELETED, true);
             }
             
-            folderInbox.close(true);
+            folderInbox.close(false);
             
             return null;
         } catch (MessagingException e) {
@@ -139,11 +144,17 @@ public class ImapService {
         }
 	}
 	
-	public static Message[] getMessagesByMessageID(Folder folderInbox, String messageID)
+	public static Message[] getMessagesByMessageID(Folder folderInbox, String messageID, boolean delete)
 			throws PnSpapiTemporaryErrorException, PnSpapiPermanentErrorException {
 		
 		try {
-			SearchTerm searchTerm = new MessageIDTerm(messageID);
+			SearchTerm searchTerm;
+			if (delete) {
+				MessageIDTerm searchTerm1 = new MessageIDTerm(messageID);
+				FlagTerm searchTerm2 = new FlagTerm(new Flags(Flags.Flag.DELETED), false);
+				searchTerm = new AndTerm(searchTerm1, searchTerm2);
+			} else
+				searchTerm = new MessageIDTerm(messageID);
 	        Message[] messages = folderInbox.search(searchTerm);
 	        
 	        if (messages.length > 1)
@@ -158,5 +169,15 @@ public class ImapService {
     public static String getHashFolder (String messageID) {
         String sha1MessageID = DigestUtils.sha1Hex(messageID);
         return sha1MessageID.substring(0, 1);
+    }
+    
+    private static String trimMessageID (String messageID) {
+        if (messageID.startsWith("<"))
+            messageID = messageID.substring(1);
+        
+        if (messageID.endsWith(">"))
+            messageID = messageID.substring(0, messageID.length()-1);
+        
+        return messageID;
     }
 }
