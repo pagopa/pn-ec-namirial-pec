@@ -75,6 +75,8 @@ public class ImapService {
         
         Store store = imapConnectionPool.getImapConnection();
         
+        messageID = trimMessageID(messageID);
+        
         try {
             Folder folderInbox = store.getFolder(CONSTANT_HASH_FOLDER + getHashFolder(messageID));
             folderInbox.open(Folder.READ_WRITE);
@@ -119,6 +121,8 @@ public class ImapService {
         
         Store store = imapConnectionPool.getImapConnection();
         
+        messageID = trimMessageID(messageID);
+        
         try {
             Folder folderInbox = store.getFolder(CONSTANT_HASH_FOLDER + getHashFolder(messageID));
             folderInbox.open(Folder.READ_WRITE);
@@ -158,5 +162,15 @@ public class ImapService {
     public static String getHashFolder (String messageID) {
         String sha1MessageID = DigestUtils.sha1Hex(messageID);
         return sha1MessageID.substring(0, 1);
+    }
+    
+    private static String trimMessageID (String messageID) {
+        if (messageID.startsWith("<"))
+            messageID = messageID.substring(1);
+        
+        if (messageID.endsWith(">"))
+            messageID = messageID.substring(0, messageID.length()-1);
+        
+        return messageID;
     }
 }
