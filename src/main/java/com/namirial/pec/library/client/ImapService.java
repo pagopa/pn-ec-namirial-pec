@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.apache.commons.codec.digest.DigestUtils;
 
+import com.namirial.pec.library.cache.MessagesCache;
 import com.namirial.pec.library.conf.Configuration;
 import com.namirial.pec.library.pool.ImapConnectionPool;
 
@@ -22,10 +23,12 @@ import jakarta.mail.Message;
 import jakarta.mail.MessageRemovedException;
 import jakarta.mail.MessagingException;
 import jakarta.mail.Store;
+import jakarta.mail.UIDFolder;
 import jakarta.mail.search.AndTerm;
 import jakarta.mail.search.FlagTerm;
 import jakarta.mail.search.MessageIDTerm;
 import jakarta.mail.search.SearchTerm;
+import redis.clients.jedis.Jedis;
 
 public class ImapService {
 	
@@ -147,23 +150,53 @@ public class ImapService {
 	public static Message[] getMessagesByMessageID(Folder folderInbox, String messageID, boolean delete)
 			throws PnSpapiTemporaryErrorException, PnSpapiPermanentErrorException {
 		
+    	MessagesCache messagesCache = null;
+    	Jedis cacheConnection = null;
+		
 		try {
-			SearchTerm searchTerm;
-			if (delete) {
-				MessageIDTerm searchTerm1 = new MessageIDTerm(messageID);
-				FlagTerm searchTerm2 = new FlagTerm(new Flags(Flags.Flag.DELETED), false);
-				searchTerm = new AndTerm(searchTerm1, searchTerm2);
-			} else
-				searchTerm = new MessageIDTerm(messageID);
-	        Message[] messages = folderInbox.search(searchTerm);
-	        
-	        if (messages.length > 1)
-	        	throw new PnSpapiPermanentErrorException ("The number of messages returned is > 1");
-	        
+			Long UID = null;
+			
+			if (Boolean.valueOf(Configuration.getCache())) {
+				messagesCache = MessagesCache.getInstance();
+				cacheConnection = messagesCache.getConnection();
+				UID = messagesCache.get(cacheConnection, folderInbox.getFullName(),messageID);
+			}
+			
+			Message[] messages = new Message[0];
+			
+			if (UID != null) {
+				UIDFolder uf = (UIDFolder) folderInbox;
+				
+				if (uf.getMessageByUID(UID) != null) {
+					messages = new Message[1];
+					messages[0] = uf.getMessageByUID(UID);
+				}
+			} else {
+				SearchTerm searchTerm;
+				if (delete) {
+					MessageIDTerm searchTerm1 = new MessageIDTerm(messageID);
+					FlagTerm searchTerm2 = new FlagTerm(new Flags(Flags.Flag.DELETED), false);
+					searchTerm = new AndTerm(searchTerm1, searchTerm2);
+				} else
+					searchTerm = new MessageIDTerm(messageID);
+		        messages = folderInbox.search(searchTerm);
+		        
+		        if (messages.length > 1)
+		        	throw new PnSpapiPermanentErrorException ("The number of messages returned is > 1");
+		        
+		        if (messagesCache != null && messages.length != 0) {
+			        UIDFolder uf = (UIDFolder) folderInbox;
+			        messagesCache.refresh(cacheConnection, Long.valueOf(uf.getUID(messages[0])), folderInbox);
+		        }
+			}
+			
 	        return messages;
 		} catch (MessagingException e) {
 			throw new PnSpapiTemporaryErrorException ("getMessagesByMessageID: " + e.getClass() + " " + e.getMessage());
-		}
+        } finally {
+        	if (messagesCache != null && cacheConnection != null)
+        		messagesCache.closeConnection(cacheConnection);
+        }
 	}
     
     public static String getHashFolder (String messageID) {
@@ -180,4 +213,31 @@ public class ImapService {
         
         return messageID;
     }
+    
+    public static Long getMessagesForCache (Folder folder) {
+    	
+    	int limit = 1000;
+    	MessagesCache messagesCache = null;
+    	Jedis cacheConnection = null;
+		
+        try {
+            UIDFolder uf = (UIDFolder) folder;
+            Message[] messages = folder.getMessages();
+            Long lastUID = null;
+            
+            messagesCache = MessagesCache.getInstance();
+            cacheConnection = messagesCache.getConnection();
+            
+            for (int i = 0; i < limit && i < messages.length; i++) {
+        		Message message = messages[i];
+            	messagesCache.put(cacheConnection, folder.getFullName(), trimMessageID(message.getHeader("Message-ID")[0]), Long.valueOf(uf.getUID(message)));
+            }
+            return lastUID;
+        } catch (MessagingException e) {
+            throw new PnSpapiTemporaryErrorException ("getMessagesForCache: " + e.getClass() + " " + e.getMessage());
+        } finally {
+        	if (messagesCache != null && cacheConnection != null)
+        		messagesCache.closeConnection(cacheConnection);
+        }
+	}
 }
