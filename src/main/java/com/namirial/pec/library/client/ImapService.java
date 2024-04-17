@@ -230,7 +230,8 @@ public class ImapService {
             
             for (int i = 0; i < limit && i < messages.length; i++) {
         		Message message = messages[i];
-            	messagesCache.put(cacheConnection, folder.getFullName(), trimMessageID(message.getHeader("Message-ID")[0]), Long.valueOf(uf.getUID(message)));
+        		lastUID = Long.valueOf(uf.getUID(message));
+            	messagesCache.put(cacheConnection, folder.getFullName(), trimMessageID(message.getHeader("Message-ID")[0]), lastUID);
             }
             return lastUID;
         } catch (MessagingException e) {

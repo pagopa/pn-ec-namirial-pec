@@ -57,15 +57,15 @@ public class MessagesCache {
 		String lastUIDCache = cacheConnection.hget(CONSTANT_FOLDER_PREFIX + folderName, CONSTANT_ATTRIBUTE_LASTUID);
 		String refreshTimeCache = cacheConnection.hget(CONSTANT_FOLDER_PREFIX + folderName, CONSTANT_ATTRIBUTE_REFRESHTIME);
 		
-		if ((lastUIDCache == null || lastUIDCache.equals("null") || Long.valueOf(lastUIDCache) < UID) && (refreshTimeCache == null
-				|| refreshTimeCache.equals("null") || Long.valueOf(refreshTimeCache) < System.currentTimeMillis() + timeToLive)) {
+		if ((lastUIDCache == null || Long.valueOf(lastUIDCache) < UID) && (refreshTimeCache == null
+				|| Long.valueOf(refreshTimeCache) < System.currentTimeMillis() + timeToLive)) {
 			cacheConnection.del(CONSTANT_MSGID_PREFIX + folderName);
 			cacheConnection.del(CONSTANT_FOLDER_PREFIX + folderName);
 			cacheConnection.hset(CONSTANT_FOLDER_PREFIX + folderName, CONSTANT_ATTRIBUTE_REFRESHTIME,
 					String.valueOf(System.currentTimeMillis()));
 			
 			Long lastUID = ImapService.getMessagesForCache(folder);
-			cacheConnection.hset(CONSTANT_FOLDER_PREFIX + folderName, CONSTANT_ATTRIBUTE_LASTUID,  String.valueOf(lastUID));
+			cacheConnection.hset(CONSTANT_FOLDER_PREFIX + folderName, CONSTANT_ATTRIBUTE_LASTUID, String.valueOf(lastUID));
 		}
 	}
 }
