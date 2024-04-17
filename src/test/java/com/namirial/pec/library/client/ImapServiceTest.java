@@ -78,7 +78,7 @@ class ImapServiceTest {
         assertEquals(pnGetMessagesResponse.getNumOfMessages(), returnedPnGetMessagesResponse.getNumOfMessages());
     }
     
-    //@Test
+    @Test
     public void markMessageAsReadSuccess() throws MessagingException {
         
         Message[] messagesMock = new Message[1];
@@ -109,7 +109,7 @@ class ImapServiceTest {
         assertEquals(numOfMessages, returnedNumOfMessages);
     }
     
-    //@Test
+    @Test
     public void deleteMessageSuccess() throws MessagingException {
     	
         Message[] messagesMock = new Message[1];
@@ -165,7 +165,7 @@ class ImapServiceTest {
         });
     }
     
-    //@Test
+    @Test
     public void getMessagesByMessageIDSuccess() throws MessagingException {
         
         Message[] messagesMock = new Message[1];
