@@ -19,6 +19,9 @@ public class Configuration {
     
     private static final String DEFAULT_POOL_SMTP_MINIDLE = "1";
     
+    //CACHE
+    private static final String DEFAULT_SERVER_CACHE = "false";
+    
     //IMAP
     public static String getImapHost() {
         return System.getProperty("namirial.server.imap.address");
@@ -74,5 +77,18 @@ public class Configuration {
     
     public static String getPoolSmtpMinIdle() {
         return System.getProperty("namirial.pool.smtp.minidle", DEFAULT_POOL_SMTP_MINIDLE);
+    }
+    
+    //CACHE
+    public static String getCache() {
+        return System.getProperty("namirial.server.cache", DEFAULT_SERVER_CACHE);
+    }
+    
+    public static String getCacheEndpoint() {
+        return System.getProperty("namirial.server.cache.endpoint");
+    }
+    
+    public static String getCacheApikey() {
+        return System.getProperty("namirial.server.cache.apikey");
     }
 }
