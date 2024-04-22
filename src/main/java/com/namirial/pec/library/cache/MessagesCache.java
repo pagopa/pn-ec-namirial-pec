@@ -62,13 +62,10 @@ public class MessagesCache {
 	
 	public Long get (Jedis cacheConnection, String folderName, String messageId) {
 		try {
-			if (cacheConnection.hget(CONSTANT_MSGID_PREFIX + folderName, messageId) != null) {
-				log.info("MessagesCache-messageId {} cached", messageId);
+			if (cacheConnection.hget(CONSTANT_MSGID_PREFIX + folderName, messageId) != null)
 				return Long.valueOf(cacheConnection.hget(CONSTANT_MSGID_PREFIX + folderName, messageId));
-			} else {
-				log.info("MessagesCache-messageId {} not cached", messageId);
+			else
 				return null;
-			}
 		} catch (IllegalStateException | JedisConnectionException e) {
 			throw new PnSpapiTemporaryErrorException ("get: " + e.getClass() + " " + e.getMessage());
 		}
