@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.codec.digest.DigestUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.namirial.pec.library.cache.MessagesCache;
 import com.namirial.pec.library.conf.Configuration;
@@ -36,8 +34,6 @@ public class ImapService {
 	
 	private static final String CONSTANT_FOLDER = Configuration.getImapFolder();
     private static final String CONSTANT_HASH_FOLDER = "INBOX.";
-    
-    private static final Logger log = LoggerFactory.getLogger(ImapService.class);
 	
 	public static PnGetMessagesResponse getUnreadMessages (int limit) {
 		
@@ -159,8 +155,6 @@ public class ImapService {
 		
 		try {
 			Long UID = null;
-			
-			log.info("cache {} for {} and messageID {}", Boolean.valueOf(Configuration.getCache()), folderInbox, messageID);
 			
 			if (Boolean.valueOf(Configuration.getCache())) {
 				messagesCache = MessagesCache.getInstance();
