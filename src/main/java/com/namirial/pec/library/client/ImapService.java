@@ -188,7 +188,7 @@ public class ImapService {
 		        messages = folderInbox.search(searchTerm);
 
 				for (Message messageLog : messages)
-                    log.debug("Find message - MessageID: {}, MessageNumber: {}",
+                    log.error("Find message - MessageID: {}, MessageNumber: {}",
                             messageLog.getHeader(messageID),
                             messageLog.getMessageNumber()
                     );
