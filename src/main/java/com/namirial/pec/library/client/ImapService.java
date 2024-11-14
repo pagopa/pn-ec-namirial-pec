@@ -189,7 +189,7 @@ public class ImapService {
 
 				for (Message messageLog : messages)
                     log.error("Find message - MessageID: {}, MessageNumber: {}",
-                            messageLog.getHeader(messageID),
+                            messageLog.getHeader("Message-ID"),
                             messageLog.getMessageNumber()
                     );
 
