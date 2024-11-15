@@ -5,6 +5,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.sun.mail.imap.IMAPMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.apache.commons.codec.digest.DigestUtils;
 
 import com.namirial.pec.library.cache.MessagesCache;
@@ -34,7 +38,9 @@ public class ImapService {
 	
 	private static final String CONSTANT_FOLDER = Configuration.getImapFolder();
     private static final String CONSTANT_HASH_FOLDER = "INBOX.";
-	
+	private static final Logger log = LoggerFactory.getLogger(ImapService.class);
+
+
 	public static PnGetMessagesResponse getUnreadMessages (int limit) {
 		
 		ImapConnectionPool imapConnectionPool = ImapConnectionPool.getInstance();
@@ -180,14 +186,29 @@ public class ImapService {
 				} else
 					searchTerm = new MessageIDTerm(messageID);
 		        messages = folderInbox.search(searchTerm);
-		        
+
+				for (Message messageLog : messages){
+					String[] messageIdHeader = messageLog.getHeader("Message-ID");
+					String messageId = "Empty";
+					if(messageIdHeader != null && messageIdHeader.length>0) {
+						messageId = messageIdHeader[0];
+					}
+					log.error("Find message - MessageID: {}, MessageNumber: {}",
+							messageId,
+							messageLog.getMessageNumber()
+					);
+				}
+
+
 		        if (messages.length > 1)
 		        	throw new PnSpapiPermanentErrorException ("The number of messages returned is > 1");
 		        
 		        if (messagesCache != null && messages.length != 0) {
 			        UIDFolder uf = (UIDFolder) folderInbox;
-			        messagesCache.refresh(cacheConnection, Long.valueOf(uf.getUID(messages[0])), folderInbox);
+					Long uid = Long.valueOf(uf.getUID(messages[0]));
+			        messagesCache.refresh(cacheConnection, uid, folderInbox);
 		        }
+
 			}
 			
 	        return messages;
