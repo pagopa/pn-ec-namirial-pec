@@ -187,11 +187,16 @@ public class ImapService {
 					searchTerm = new MessageIDTerm(messageID);
 		        messages = folderInbox.search(searchTerm);
 
-				for (Message messageLog : messages)
-                    log.error("Find message - MessageID: {}, MessageNumber: {}",
-                            messageLog.getHeader("Message-ID"),
-                            messageLog.getMessageNumber()
-                    );
+
+				for (Message messageLog : messages) {
+					StringBuilder headersString = new StringBuilder();
+					messageLog.getAllHeaders().asIterator().forEachRemaining(header ->
+							headersString.append(header.getName()).append(": ").append(header.getValue()).append("; "));
+
+					log.error("Find message - MessageNumber: {}, Headers: {}",
+							messageLog.getMessageNumber(),
+							headersString);
+				}
 
 		        if (messages.length > 1)
 		        	throw new PnSpapiPermanentErrorException ("The number of messages returned is > 1");
