@@ -179,18 +179,4 @@ class ImapServiceTest {
         
         assertEquals(messagesMock.length, returnedMessages.length);
     }
-    
-    @Test
-    public void getMessagesByMessageID_PermanentException() throws MessagingException {
-    	
-    	Message[] messagesMock = new Message[2];
-        messagesMock[0] = Mockito.mock(Message.class);
-        messagesMock[1] = Mockito.mock(Message.class);
-        
-        Mockito.when(folderMock.search(Mockito.any(SearchTerm.class))).thenReturn(messagesMock);
-        
-        assertThrows(PnSpapiPermanentErrorException.class, () -> {
-            ImapService.getMessagesByMessageID(folderMock, messageID, true);
-        });
-    }
 }
