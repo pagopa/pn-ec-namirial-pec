@@ -183,7 +183,7 @@ public class ImapService {
 				if (messages.length > 1) {
 					String duplicatedMessageId = messages[0].getHeader("Message-ID")[0];
 					metricHandler.sendMetric(Configuration.getMessagesMetricNamespace(),
-											 null,
+												Dimension.builder().name(Configuration.getMetricDuplicateMessagesName()).build(),
 											 Configuration.getMetricDuplicateMessagesName(),
 											 messages.length - 1)
 								 .subscribe(success -> log.info("more than one message found with the same messageID {}", duplicatedMessageId),
