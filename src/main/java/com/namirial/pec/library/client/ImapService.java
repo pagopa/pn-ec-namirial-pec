@@ -4,7 +4,6 @@ import com.namirial.pec.library.cache.MessagesCache;
 import com.namirial.pec.library.conf.Configuration;
 import com.namirial.pec.library.pool.ImapConnectionPool;
 import com.sun.mail.util.MessageRemovedIOException;
-import it.pagopa.pn.commons.utils.metrics.cloudwatch.CloudWatchMetricHandler;
 import it.pagopa.pn.library.exceptions.PnSpapiPermanentErrorException;
 import it.pagopa.pn.library.exceptions.PnSpapiTemporaryErrorException;
 import it.pagopa.pn.library.pec.pojo.PnGetMessagesResponse;
@@ -18,21 +17,22 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
-import software.amazon.awssdk.services.cloudwatch.CloudWatchAsyncClient;
-import software.amazon.awssdk.services.cloudwatch.model.Dimension;
+import software.amazon.awssdk.services.cloudwatch.CloudWatchClient;
+import software.amazon.awssdk.services.cloudwatch.model.PutMetricDataRequest;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.namirial.pec.library.utils.MetricUtils.createMetricDataRequest;
+
 public class ImapService {
 	private static final Logger log = LoggerFactory.getLogger(ImapService.class);
 	
 	private static final String CONSTANT_FOLDER = Configuration.getImapFolder();
     private static final String CONSTANT_HASH_FOLDER = "INBOX.";
-
-	private static final CloudWatchMetricHandler metricHandler = new CloudWatchMetricHandler(CloudWatchAsyncClient.create());
+	private static final CloudWatchClient cloudWatchClient = CloudWatchClient.create();
 
 	public static PnGetMessagesResponse getUnreadMessages (int limit) {
 		
@@ -182,12 +182,13 @@ public class ImapService {
 
 				if (messages.length > 1) {
 					String duplicatedMessageId = messages[0].getHeader("Message-ID")[0];
-					metricHandler.sendMetric(Configuration.getMessagesMetricNamespace(),
-												Dimension.builder().name("Multiple occurrencies").value("messageId").build(),
-											 Configuration.getMetricDuplicateMessagesName(),
-											 messages.length - 1)
-								 .subscribe(success -> log.info("more than one message found with the same messageID {}", duplicatedMessageId),
-											error -> log.error("Error during sending metric to CloudWatch: {}", error.getMessage(), error));
+					log.info("More than one message found with the same messageID {}", duplicatedMessageId);
+
+					PutMetricDataRequest req = createMetricDataRequest(Configuration.getMetricDuplicateMessagesName(),
+							Configuration.getMessagesMetricNamespace(),
+							(double) messages.length - 1);
+
+					cloudWatchClient.putMetricData(req);
 				}
 
 		        if (messagesCache != null && messages.length != 0) {
