@@ -19,12 +19,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
 import software.amazon.awssdk.services.cloudwatch.CloudWatchAsyncClient;
+import software.amazon.awssdk.services.cloudwatch.CloudWatchClient;
 import software.amazon.awssdk.services.cloudwatch.model.Dimension;
+import software.amazon.awssdk.services.cloudwatch.model.PutMetricDataRequest;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.namirial.pec.library.utils.MetricUtils.createMetricDataRequest;
 
 
 public class ImapService {
@@ -32,7 +36,7 @@ public class ImapService {
 	
 	private static final String CONSTANT_FOLDER = Configuration.getImapFolder();
     private static final String CONSTANT_HASH_FOLDER = "INBOX.";
-	private static final CloudWatchMetricHandler cloudWatchMetricHandler = new CloudWatchMetricHandler(CloudWatchAsyncClient.create());
+	private static final CloudWatchClient cloudWatchClient = CloudWatchClient.create();
 
 
 	public static PnGetMessagesResponse getUnreadMessages (int limit) {
@@ -185,11 +189,11 @@ public class ImapService {
 					String duplicatedMessageId = messages[0].getHeader("Message-ID")[0];
 					log.info("More than one message found with the same messageID {}", duplicatedMessageId);
 
-					cloudWatchMetricHandler.sendMetric(
+					PutMetricDataRequest req = createMetricDataRequest(Configuration.getMetricDuplicateMessagesName(),
 							Configuration.getMessagesMetricNamespace(),
-							Dimension.builder().name(Configuration.getMetricDuplicateMessagesName()).build(),
-							Configuration.getMetricDuplicateMessagesName(),
-							(double) messages.length-1);
+							(double) messages.length - 1);
+
+					cloudWatchClient.putMetricData(req);
 				}
 
 		        if (messagesCache != null && messages.length != 0) {
