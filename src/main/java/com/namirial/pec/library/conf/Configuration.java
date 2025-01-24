@@ -98,6 +98,6 @@ public class Configuration {
     }
 
     public static String getMetricDuplicateMessagesName() {
-        return System.getProperty("namirial.metric.duplicate.receipt.name");
+            return System.getProperty("namirial.metric.duplicate.receipt.name");
     }
 }
