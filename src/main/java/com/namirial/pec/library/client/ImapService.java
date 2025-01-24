@@ -19,9 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
 import software.amazon.awssdk.services.cloudwatch.CloudWatchAsyncClient;
-import software.amazon.awssdk.services.cloudwatch.CloudWatchClient;
 import software.amazon.awssdk.services.cloudwatch.model.Dimension;
-import software.amazon.awssdk.services.cloudwatch.model.PutMetricDataRequest;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -34,11 +32,8 @@ public class ImapService {
 	
 	private static final String CONSTANT_FOLDER = Configuration.getImapFolder();
     private static final String CONSTANT_HASH_FOLDER = "INBOX.";
-	private static CloudWatchMetricHandler cloudWatchMetricHandler;
+	private static final CloudWatchMetricHandler cloudWatchMetricHandler = new CloudWatchMetricHandler(CloudWatchAsyncClient.create());
 
-    public ImapService(CloudWatchMetricHandler cloudWatchMetricHandler) {
-        this.cloudWatchMetricHandler = new CloudWatchMetricHandler(CloudWatchAsyncClient.create());
-    }
 
 	public static PnGetMessagesResponse getUnreadMessages (int limit) {
 		
@@ -190,14 +185,9 @@ public class ImapService {
 					String duplicatedMessageId = messages[0].getHeader("Message-ID")[0];
 					log.info("More than one message found with the same messageID {}", duplicatedMessageId);
 
-					Dimension dimension = Dimension.builder()
-							.name("DimensionMessageName")
-							.value(Configuration.getMetricDuplicateMessagesName())
-							.build();
-
 					cloudWatchMetricHandler.sendMetric(
 							Configuration.getMessagesMetricNamespace(),
-							dimension,
+							Dimension.builder().name(Configuration.getMetricDuplicateMessagesName()).build(),
 							Configuration.getMetricDuplicateMessagesName(),
 							(double) messages.length-1);
 				}
