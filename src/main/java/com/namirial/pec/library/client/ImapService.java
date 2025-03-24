@@ -1,40 +1,44 @@
 package com.namirial.pec.library.client;
 
+import com.namirial.pec.library.cache.MessagesCache;
+import com.namirial.pec.library.conf.Configuration;
+import com.namirial.pec.library.pool.ImapConnectionPool;
+import com.sun.mail.util.MessageRemovedIOException;
+import it.pagopa.pn.commons.utils.metrics.cloudwatch.CloudWatchMetricHandler;
+import it.pagopa.pn.library.exceptions.PnSpapiPermanentErrorException;
+import it.pagopa.pn.library.exceptions.PnSpapiTemporaryErrorException;
+import it.pagopa.pn.library.pec.pojo.PnGetMessagesResponse;
+import it.pagopa.pn.library.pec.pojo.PnListOfMessages;
+import jakarta.mail.*;
+import jakarta.mail.search.AndTerm;
+import jakarta.mail.search.FlagTerm;
+import jakarta.mail.search.MessageIDTerm;
+import jakarta.mail.search.SearchTerm;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import redis.clients.jedis.Jedis;
+import software.amazon.awssdk.services.cloudwatch.CloudWatchAsyncClient;
+import software.amazon.awssdk.services.cloudwatch.CloudWatchClient;
+import software.amazon.awssdk.services.cloudwatch.model.Dimension;
+import software.amazon.awssdk.services.cloudwatch.model.PutMetricDataRequest;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.codec.digest.DigestUtils;
+import static com.namirial.pec.library.utils.MetricUtils.createMetricDataRequest;
 
-import com.namirial.pec.library.cache.MessagesCache;
-import com.namirial.pec.library.conf.Configuration;
-import com.namirial.pec.library.pool.ImapConnectionPool;
-
-import com.sun.mail.util.MessageRemovedIOException;
-
-import it.pagopa.pn.library.exceptions.PnSpapiPermanentErrorException;
-import it.pagopa.pn.library.exceptions.PnSpapiTemporaryErrorException;
-import it.pagopa.pn.library.pec.pojo.PnGetMessagesResponse;
-import it.pagopa.pn.library.pec.pojo.PnListOfMessages;
-import jakarta.mail.Flags;
-import jakarta.mail.Folder;
-import jakarta.mail.Message;
-import jakarta.mail.MessageRemovedException;
-import jakarta.mail.MessagingException;
-import jakarta.mail.Store;
-import jakarta.mail.UIDFolder;
-import jakarta.mail.search.AndTerm;
-import jakarta.mail.search.FlagTerm;
-import jakarta.mail.search.MessageIDTerm;
-import jakarta.mail.search.SearchTerm;
-import redis.clients.jedis.Jedis;
 
 public class ImapService {
+	private static final Logger log = LoggerFactory.getLogger(ImapService.class);
 	
 	private static final String CONSTANT_FOLDER = Configuration.getImapFolder();
     private static final String CONSTANT_HASH_FOLDER = "INBOX.";
-	
+	private static final CloudWatchClient cloudWatchClient = CloudWatchClient.create();
+
+
 	public static PnGetMessagesResponse getUnreadMessages (int limit) {
 		
 		ImapConnectionPool imapConnectionPool = ImapConnectionPool.getInstance();
@@ -180,10 +184,18 @@ public class ImapService {
 				} else
 					searchTerm = new MessageIDTerm(messageID);
 		        messages = folderInbox.search(searchTerm);
-		        
-		        if (messages.length > 1)
-		        	throw new PnSpapiPermanentErrorException ("The number of messages returned is > 1");
-		        
+
+				if (messages.length > 1) {
+					String duplicatedMessageId = messages[0].getHeader("Message-ID")[0];
+					log.info("More than one message found with the same messageID {}", duplicatedMessageId);
+
+					PutMetricDataRequest req = createMetricDataRequest(Configuration.getMetricDuplicateMessagesName(),
+							Configuration.getMessagesMetricNamespace(),
+							(double) messages.length - 1);
+
+					cloudWatchClient.putMetricData(req);
+				}
+
 		        if (messagesCache != null && messages.length != 0) {
 			        UIDFolder uf = (UIDFolder) folderInbox;
 			        messagesCache.refresh(cacheConnection, Long.valueOf(uf.getUID(messages[0])), folderInbox);

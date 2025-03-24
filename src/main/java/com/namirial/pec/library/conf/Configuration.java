@@ -91,4 +91,13 @@ public class Configuration {
     public static String getCacheApikey() {
         return System.getProperty("namirial.server.cache.apikey");
     }
+
+    // METRIC
+    public static String getMessagesMetricNamespace() {
+        return System.getProperty("namirial.metric.duplicate.receipt.namespace");
+    }
+
+    public static String getMetricDuplicateMessagesName() {
+            return System.getProperty("namirial.metric.duplicate.receipt.name");
+    }
 }
