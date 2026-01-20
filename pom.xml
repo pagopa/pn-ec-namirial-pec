@@ -1,114 +1,114 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>com.namirial.pec.library</groupId>
-  <artifactId>pn-ec-namirial-pec</artifactId>
-  <version>1.4.0-SNAPSHOT</version>
-  
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.namirial.pec.library</groupId>
+	<artifactId>pn-ec-namirial-pec</artifactId>
+	<version>1.4.0-SNAPSHOT</version>
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.plugin.version>3.10.1</maven.compiler.plugin.version>
-		<java.version>17</java.version>
-  	</properties>
-	
+		<java.version>21</java.version>
+	</properties>
+
 	<dependencies>
 		<dependency>
-            <groupId>it.pagopa.pn</groupId>
-            <artifactId>pn-servizifiduciari-spapi</artifactId>
-            <version>1.0.0</version>
-       	</dependency>
-		
+			<groupId>it.pagopa.pn</groupId>
+			<artifactId>pn-servizifiduciari-spapi</artifactId>
+			<version>1.1.0-SNAPSHOT</version>
+		</dependency>
+
 		<!-- https://mvnrepository.com/artifact/com.sun.mail/jakarta.mail -->
 		<dependency>
-		    <groupId>com.sun.mail</groupId>
-		    <artifactId>jakarta.mail</artifactId>
-		    <version>2.0.1</version>
+			<groupId>com.sun.mail</groupId>
+			<artifactId>jakarta.mail</artifactId>
+			<version>2.0.1</version>
 		</dependency>
-		
+
 		<!-- https://mvnrepository.com/artifact/com.sun.mail/smtp -->
 		<dependency>
-		    <groupId>com.sun.mail</groupId>
-		    <artifactId>smtp</artifactId>
-		    <version>2.0.1</version>
+			<groupId>com.sun.mail</groupId>
+			<artifactId>smtp</artifactId>
+			<version>2.0.1</version>
 		</dependency>
-		
+
 		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-pool2 -->
 		<dependency>
-		    <groupId>org.apache.commons</groupId>
-		    <artifactId>commons-pool2</artifactId>
-		    <version>2.12.0</version>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-pool2</artifactId>
+			<version>2.12.0</version>
 		</dependency>
-		
+
 		<!-- https://mvnrepository.com/artifact/redis.clients/jedis -->
 		<dependency>
-		    <groupId>redis.clients</groupId>
-		    <artifactId>jedis</artifactId>
-		    <version>5.1.2</version>
+			<groupId>redis.clients</groupId>
+			<artifactId>jedis</artifactId>
+			<version>5.1.5</version>
 		</dependency>
-		
+
 		<dependency>
-		    <groupId>org.junit.jupiter</groupId>
-		    <artifactId>junit-jupiter-api</artifactId>
-		    <version>5.9.3</version>
-		    <scope>test</scope>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-api</artifactId>
+			<version>5.10.1</version>
+			<scope>test</scope>
 		</dependency>
-		
+
 		<dependency>
-		    <groupId>io.projectreactor</groupId>
-		    <artifactId>reactor-test</artifactId>
-		    <scope>test</scope>
-		    <version>3.4.25</version>
+			<groupId>io.projectreactor</groupId>
+			<artifactId>reactor-test</artifactId>
+			<scope>test</scope>
+			<version>3.6.10</version>
 		</dependency>
-		
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>2.15.1</version>
-            <scope>test</scope>
-        </dependency>
-        
+
 		<dependency>
-		    <groupId>org.mockito</groupId>
-		    <artifactId>mockito-core</artifactId>
-		    <version>5.11.0</version>
-		    <scope>test</scope>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.16.1</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<version>5.14.2</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
-	
+
 	<build>
 		<plugins>
-	    	<plugin>
-	        	<groupId>org.apache.maven.plugins</groupId>
-	        	<artifactId>maven-compiler-plugin</artifactId>
-	        	<version>${maven.compiler.plugin.version}</version>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${maven.compiler.plugin.version}</version>
 				<configuration>
 					<source>${java.version}</source>
 					<target>${java.version}</target>
 				</configuration>
-	      	</plugin>
+			</plugin>
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.8.8</version>
+				<version>0.8.14</version>
 				<executions>
-			        <execution>
-			          <id>prepare-agent</id>
-			          <goals>
-			            <goal>prepare-agent</goal>
-			          </goals>
-			        </execution>
-			        <execution>
-			          <id>report</id>
-			          <goals>
-			            <goal>report</goal>
-			          </goals>
-			          <configuration>
-			            <formats>
-			              <format>XML</format>
-			            </formats>
-			          </configuration>
-			        </execution>
+					<execution>
+						<id>prepare-agent</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>report</id>
+						<goals>
+							<goal>report</goal>
+						</goals>
+						<configuration>
+							<formats>
+								<format>XML</format>
+							</formats>
+						</configuration>
+					</execution>
 				</executions>
 			</plugin>
-    	</plugins>
+		</plugins>
 	</build>
 </project>
